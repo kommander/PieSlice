@@ -1,9 +1,13 @@
 package  
 {
 	import com.greensock.TweenLite;
+	import flash.display.GradientType;
 	import flash.display.Graphics;
+	import flash.display.SpreadMethod;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.filters.ConvolutionFilter;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.filters.DropShadowFilter;
 	import flash.utils.*;
@@ -26,7 +30,15 @@ package
 		private static const HIDE_CLOSED_CHILDREN_DELAY_INTERVAL:Number = 100;
 		private static const HIDE_OPEN_CHILDREN_REDUCTION_INTERVAL:Number = 100;
 		private static const CLOSED_CHILDREN_SIZE:Number = 3;
-			
+		
+		public static const COLOR_BRIGHTEN:String = 'pie_slice_color_brighten';
+		public static const COLOR_DARKEN:String = 'pie_slice_color_darken';
+		public static const COLOR_NORMAL:String = 'pie_slice_color_normal';
+		
+		private static var _reverseColors:Boolean = false;
+		private var _colorMethod:String = COLOR_DARKEN;
+		private var _colorModificationPercentage:Number = 50;
+		
 		private var _slices:Array = new Array();
 		private var _parentSlice:PieSlice = null;
 		private var _angle:Number = 0;
@@ -37,6 +49,7 @@ package
 		private var _maxChildrenAutoDegreeSize:Number = 40;
 		private var _maxChildrenAutoClosedDegreeSize:Number = 20;
 		private var _childSliceSpacing:Number = 1;
+		
 		private var _opened:Boolean = false;
 		
 		private var _sliceContainer:Sprite = new Sprite();
@@ -50,7 +63,8 @@ package
 		private var drawPieSliceAngle2:Number = 0;
 		private var drawPieSlicePoint1:Point = new Point();
 		
-		public var color:uint = 0x76C7C6;
+		private var _color:uint = 0x76C7C6;
+		private var _secondColor:uint = brightenUpColor(_color, _colorModificationPercentage);
 		
 		public function PieSlice()
 		{
@@ -59,6 +73,19 @@ package
 			_sliceShape.addEventListener(MouseEvent.MOUSE_OVER, clearTimeoutListener);
 			
 			drawThis();
+		}
+		
+		private function setUpColor():void
+		{
+			switch(_colorMethod)
+			{
+				case COLOR_BRIGHTEN:
+					_secondColor = brightenUpColor(_color, _colorModificationPercentage);
+					break;
+				case COLOR_DARKEN:
+					_secondColor = darkenColor(_color, _colorModificationPercentage);
+					break;
+			}
 		}
 		
 		public function moveChildToTop(child:PieSlice):void
@@ -81,7 +108,6 @@ package
 		public function activate():void
 		{
 			_sliceShape.addEventListener(MouseEvent.MOUSE_OVER, showOpenChildrenListener);
-			//_sliceShape.addEventListener(MouseEvent.MOUSE_OVER, clearTimeoutListener);
 			_sliceShape.addEventListener(MouseEvent.MOUSE_OUT, setTimeoutListener);
 			_sliceShape.buttonMode = true;
 			_sliceShape.useHandCursor = true;
@@ -91,7 +117,6 @@ package
 		public function deactivate():void
 		{
 			_sliceShape.removeEventListener(MouseEvent.MOUSE_OVER, showOpenChildrenListener);
-			//_sliceShape.removeEventListener(MouseEvent.MOUSE_OVER, clearTimeoutListener);
 			_sliceShape.removeEventListener(MouseEvent.MOUSE_OUT, setTimeoutListener);
 			_sliceShape.buttonMode = false;
 			_sliceShape.useHandCursor = false;
@@ -200,7 +225,6 @@ package
 			sliceToAdd.parentSlice = this;
 			sliceToAdd.radius = _outerRadius;
 			_sliceContainer.addChild(sliceToAdd);
-			//reorderChildrenAngles(_maxChildrenAutoDegreeSize, _degreeSize, 0);
 			showClosedChildren();
 			return sliceToAdd;
 		}
@@ -228,7 +252,23 @@ package
 		public function drawThis():void
 		{
 			_sliceShape.graphics.clear();
-			_sliceShape.graphics.beginFill(color);
+			
+			if (_colorMethod == COLOR_NORMAL)
+			{
+				_sliceShape.graphics.beginFill(color);
+			} else {
+				var colors:Array = (_reverseColors) ? [_secondColor, _color] : [_color, _secondColor];
+				var matrix:Matrix = new Matrix();
+				matrix.createGradientBox(_outerRadius * 2, _outerRadius * 2, 0, -_outerRadius, -_outerRadius);
+				_sliceShape.graphics.beginGradientFill(
+					GradientType.RADIAL,
+					colors,
+					[1.0, 1.0],
+					[160, 255],
+					matrix,
+					SpreadMethod.PAD);
+			}
+			
 			drawPieSlice(_sliceShape.graphics, 0, 0, -(_degreeSize / 2), (_degreeSize / 2), _innerRadius, _outerRadius);
 			_sliceShape.graphics.endFill();
 		}
@@ -261,6 +301,42 @@ package
 			
 			g.lineTo(drawPieSlicePoint1.x, drawPieSlicePoint1.y);
 		}
+		
+		private function brightenUpColor(hexColor:uint, percent:Number):uint
+		{
+			
+			var factor:Number = percent / 100;
+            var rgb:Object = hexToRgb(hexColor);
+                        
+            rgb.r += (255 - rgb.r) * factor;
+            rgb.b += (255 - rgb.b) * factor;
+            rgb.g += (255 - rgb.g) * factor;
+			
+			return rgbToHex(Math.round(rgb.r), Math.round(rgb.g), Math.round(rgb.b));
+		}
+		
+		private function darkenColor(hexColor:uint, percent:Number):uint
+		{
+			
+			var factor:Number = percent / 100;
+            var rgb:Object = hexToRgb(hexColor);
+                        
+            rgb.r *= factor;
+            rgb.b *= factor;
+            rgb.g *= factor;
+			
+			return rgbToHex(Math.round(rgb.r), Math.round(rgb.g), Math.round(rgb.b));
+		}
+		
+		private function rgbToHex(r:Number, g:Number, b:Number):Number 
+		{
+			return(r<<16 | g<<8 | b);
+        }
+
+        private function hexToRgb (hex:Number):Object
+		{
+			return {r:(hex & 0xff0000) >> 16, g:(hex & 0x00ff00) >> 8, b:hex & 0x0000ff};
+        }
 		
 		/**
 		 * Getter & Setter
@@ -334,6 +410,49 @@ package
 		public function get opened():Boolean
 		{
 			return _opened;
+		}
+		
+		public function set color(v:uint):void
+		{
+			_color = v;
+			setUpColor();
+		}
+		
+		public function get color():uint
+		{
+			return _color;
+		}
+		
+		public function set colorMethod(v:String):void
+		{
+			if (v == COLOR_BRIGHTEN || v == COLOR_DARKEN || v == COLOR_NORMAL)
+			{
+				colorMethod = v;
+				setUpColor();
+				drawThis();
+			}
+		}
+		
+		public function get colorMethod():String
+		{
+			return _colorMethod;
+		}
+		
+		public static function set reverseColors(v:Boolean):void
+		{
+			_reverseColors = v;
+		}
+		
+		public function set colorModificationPercent(v:Number):void
+		{
+			_colorModificationPercentage = v;
+			setUpColor();
+			drawThis();
+		}
+		
+		public function get colorModificationPercent():Number
+		{
+			return _colorModificationPercentage;
 		}
 		
 	}
