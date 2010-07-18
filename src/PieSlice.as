@@ -118,7 +118,7 @@ package
 			_sliceShape.removeEventListener(MouseEvent.MOUSE_OUT, setTimeoutListener);
 			_sliceShape.buttonMode = false;
 			_sliceShape.useHandCursor = false;
-			//hideChildren();
+			hideChildren();
 		}
 		
 		public function activateChildren():void
@@ -161,9 +161,24 @@ package
 			}
 		}
 		
-		private function hideChildren(animationTime:Number):void
+		private function hideChildren(animationTime:Number = PieSlice.HIDE_CLOSED_CHILDREN_ANIMATION_TIME):void
 		{
-			throw(new Error('Not yet implemented'));
+			_opened = false;
+			
+			reorderChildrenAngles(0, 0, animationTime);
+			
+			deactivateChildren();
+			
+			var delayTime:Number = 0;
+			for each (var childSlice:PieSlice in _slices)
+			{
+				TweenLite.to(childSlice, animationTime / 1000, { 
+					size: 0,
+					delay: delayTime,
+					overwrite: 0
+				});
+				delayTime += PieSlice.HIDE_CLOSED_CHILDREN_DELAY_INTERVAL / 1000;
+			}
 		}
 		
 		private function showClosedChildren(animationTime:Number = PieSlice.SHOW_CLOSED_CHILDREN_ANIMATION_TIME):void
@@ -207,7 +222,7 @@ package
 		private function clearTimeoutListener(evt:MouseEvent):void
 		{
 			clearHideChildrenTimeout();
-			//evt.stopPropagation();
+			evt.stopPropagation();
 		}
 		
 		public function clearHideChildrenTimeout():void
@@ -223,7 +238,7 @@ package
 			sliceToAdd.parentSlice = this;
 			sliceToAdd.radius = _outerRadius;
 			_sliceContainer.addChild(sliceToAdd);
-			showClosedChildren();
+			hideChildren();
 			return sliceToAdd;
 		}
 		
