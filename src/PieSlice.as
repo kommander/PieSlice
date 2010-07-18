@@ -6,10 +6,8 @@ package
 	import flash.display.SpreadMethod;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	import flash.filters.ConvolutionFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
-	import flash.filters.DropShadowFilter;
 	import flash.utils.*;
 
 	/**
@@ -36,8 +34,8 @@ package
 		public static const COLOR_NORMAL:String = 'pie_slice_color_normal';
 		
 		private static var _reverseColors:Boolean = false;
-		private var _colorMethod:String = COLOR_DARKEN;
-		private var _colorModificationPercentage:Number = 50;
+		private static var _colorMethod:String = COLOR_DARKEN;
+		private static var _colorModificationPercentage:Number = 50;
 		
 		private var _slices:Array = new Array();
 		private var _parentSlice:PieSlice = null;
@@ -64,7 +62,7 @@ package
 		private var drawPieSlicePoint1:Point = new Point();
 		
 		private var _color:uint = 0x76C7C6;
-		private var _secondColor:uint = brightenUpColor(_color, _colorModificationPercentage);
+		private var _secondColor:uint = darkenColor(_color, _colorModificationPercentage);
 		
 		public function PieSlice()
 		{
@@ -209,7 +207,7 @@ package
 		private function clearTimeoutListener(evt:MouseEvent):void
 		{
 			clearHideChildrenTimeout();
-			evt.stopPropagation();
+			//evt.stopPropagation();
 		}
 		
 		public function clearHideChildrenTimeout():void
@@ -255,7 +253,7 @@ package
 			
 			if (_colorMethod == COLOR_NORMAL)
 			{
-				_sliceShape.graphics.beginFill(color);
+				_sliceShape.graphics.beginFill(_color);
 			} else {
 				var colors:Array = (_reverseColors) ? [_secondColor, _color] : [_color, _secondColor];
 				var matrix:Matrix = new Matrix();
@@ -416,6 +414,7 @@ package
 		{
 			_color = v;
 			setUpColor();
+			drawThis();
 		}
 		
 		public function get color():uint
@@ -423,17 +422,15 @@ package
 			return _color;
 		}
 		
-		public function set colorMethod(v:String):void
+		public static function set colorMethod(v:String):void
 		{
 			if (v == COLOR_BRIGHTEN || v == COLOR_DARKEN || v == COLOR_NORMAL)
 			{
-				colorMethod = v;
-				setUpColor();
-				drawThis();
+				_colorMethod = v;
 			}
 		}
 		
-		public function get colorMethod():String
+		public static function get colorMethod():String
 		{
 			return _colorMethod;
 		}
@@ -443,14 +440,12 @@ package
 			_reverseColors = v;
 		}
 		
-		public function set colorModificationPercent(v:Number):void
+		public static function set colorModificationPercent(v:Number):void
 		{
 			_colorModificationPercentage = v;
-			setUpColor();
-			drawThis();
 		}
 		
-		public function get colorModificationPercent():Number
+		public static function get colorModificationPercent():Number
 		{
 			return _colorModificationPercentage;
 		}
