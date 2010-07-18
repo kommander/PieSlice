@@ -1,0 +1,72 @@
+PieSlice - A juicy navigation in AS3 | 2o1o
+------------------------------------
+
+This class can be used to generate an interactive sliced pie navigation
+and is released under the Creative Commons LPGL 2.1 license.
+The slices can be stacked to infinity. A testing sample is contained in the Main.as.
+A better documention and some ASDoc have to be done.
+The API is not currently set in stone yet.
+Developed with Flash develop.
+
+PieSlice uses TweenLite for animations. (www.greensock.com)
+
+Basic usage
+-----------
+
+var motherSlice:PieSlice = new PieSlice();
+motherSlice.size = 60;
+
+var childSlice:PieSlice = new PieSlice();
+motherSlice.addSlice(childSlice);
+
+var subChildSlice:PieSlice = new PieSlice();
+childSlice.addSlice(subChildSlice);
+
+and so on...
+
+
+Coloring
+--------
+
+The coloring system is quite simple, there are the color itself, three method options,
+represented in static constants, the modification percentage and a reverse colors option.
+
+- sliceInstance.color = 0xFFFFFF;
+The color can be set individually for every instance of a Pie Slice,
+gradients are generated automatically with the differnt color methods.
+
+- PieSlice.colorMethod = COLOR_BRIGHTEN | COLOR_DARKEN | COLOR_NORMAL
+The method can be changed at any time and affects all slices to asure a constant look.
+
+- PieSlice.colorMethod = PieSlice.COLOR_BRIGHTEN | PieSlice.COLOR_DARKEN
+This generates a light gradient from the set color to a brighter or either darker version of that color.
+The brightening/darkening factor can be set with the colorModificationPercent attribute.
+
+- PieSlice.colorMethod = PieSlice.COLOR_NORMAL
+This displays the plain color, colorModificationPercent has no effect.
+
+- PieSlice.reverseColors = true|false;
+As default the generated gradient is displayed  from left to right, with the set color to the left
+and the brighter/darker version to the right. This flips the colors.
+
+You have to play around with those options to find your favorite coloring.
+
+
+Sizing
+------
+
+The size attribute affects the radius of a slice when it's opened,
+child slices inherit the size of their parent. The width, respectively the angle
+for a slice can be set with the attribute degreeSize.
+
+
+Have fun Trying!
+
+Sebastian
+
+
+
+
+
+
+
