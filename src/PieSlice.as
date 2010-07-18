@@ -1,3 +1,18 @@
+/*
+	CREATIVE COMMONS
+
+	This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    For the whole License please see <http://creativecommons.org/licenses/LGPL/2.1/>.
+*/
 package  
 {
 	import com.greensock.TweenLite;
@@ -252,12 +267,12 @@ package
 		public function reorderChildrenAngles(autoDegreeSize:Number, fullSize:Number, animationTime:Number):void
 		{
 			var allAngles:Number = _slices.length * autoDegreeSize + _childSliceSpacing * _slices.length;
-			var childrenAngle:Number = -(allAngles / 2) + autoDegreeSize / 2;
+			var childrenAngle:Number = Math.round(-(allAngles / 2) + autoDegreeSize / 2);
 			if (allAngles >= fullSize)
 			{
 				autoDegreeSize = (fullSize - _childSliceSpacing * _slices.length) / _slices.length;
 				allAngles = _slices.length * autoDegreeSize;
-				childrenAngle = -(allAngles / 2);
+				childrenAngle = Math.round(-(allAngles / 2) + _childSliceSpacing);
 			}
 			for each (var childSlice:PieSlice in _slices)
 			{
