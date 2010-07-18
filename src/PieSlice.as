@@ -91,6 +91,11 @@ package
 			_sliceContainer.setChildIndex(child, _slices.length-1);
 		}
 		
+		public function moveChildToBack(child:PieSlice):void
+		{
+			_sliceContainer.setChildIndex(child, 0);
+		}
+		
 		public function closeNeighbours():void
 		{
 			if (_parentSlice != null)
@@ -136,6 +141,8 @@ package
 		private function showOpenChildrenListener(evt:MouseEvent):void
 		{
 			showOpenChildren();
+			if (_parentSlice != null)
+				_parentSlice.moveChildToBack(this);
 			evt.stopPropagation();
 		}
 		
