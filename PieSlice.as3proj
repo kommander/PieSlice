@@ -6,7 +6,7 @@
     <movie input="" />
     <movie path="bin\PieSlice.swf" />
     <movie fps="30" />
-    <movie width="800" />
+    <movie width="600" />
     <movie height="600" />
     <movie version="10" />
     <movie background="#FFFFFF" />
@@ -14,7 +14,7 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="E:\lib\as3\greensock-as3" />
+    <class path="..\..\lib\Flash\Classes\greensock-tweening-platform-as3-11" />
   </classpaths>
   <!-- Build options -->
   <build>
