@@ -5,7 +5,8 @@
 	import flash.events.Event;
 	
 	/**
-	 * ...
+	 * A little PieSlice demonstration.
+	 * 
 	 * @author Sebastian Herrlinger
 	 */
 	public class Main extends Sprite 
@@ -20,23 +21,21 @@
 		private function init(e:Event = null):void 
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-		
+			
+			PieSlice.reverseColors = true;
+			PieSlice.colorMethod = PieSlice.COLOR_DARKEN;
+			
 			var slice:PieSlice = new PieSlice();
 			addChild(slice);
+			slice.size = 80;
+			slice.color = 0x222222;
 			slice.x = stage.stageWidth / 2;
 			slice.y = stage.stageHeight / 2;
-			
-			var sliceChild:PieSlice = new PieSlice();
-			sliceChild.color = 0xFF0000;
-			slice.addSlice(sliceChild);
-			
-			var sliceChild2:PieSlice = new PieSlice();
-			sliceChild2.color = 0x00FF00;
-			slice.addSlice(sliceChild2);
 			
 			var color:uint = slice.color;
 			var sliceChild3:PieSlice;
 			var sliceChild4:PieSlice
+			
 			for (var i:int = 0; i < 5; i++)
 			{
 				sliceChild3 = new PieSlice();
@@ -48,14 +47,9 @@
 					sliceChild3.addSlice(sliceChild4);
 				}
 				slice.addSlice(sliceChild3);
-				
 			}
 			
-			slice.activate();
-			
-			//TweenLite.to(slice, 1, { size: 100, delay: 2, angle: -100 } );
-			//TweenLite.to(sliceChild, 1, { delay: 2, angle: -50 } );
-			
+			slice.activate();			
 		}
 		
 	}
